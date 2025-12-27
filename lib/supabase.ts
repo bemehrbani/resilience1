@@ -1,16 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
 
-// INSTRUCTIONS:
-// 1. Create a project at https://supabase.com
-// 2. Paste your Project URL and Anon Key below
-// 3. For production, use import.meta.env.VITE_SUPABASE_URL
+// Access environment variables safely
+const envUrl = (import.meta as any).env.VITE_SUPABASE_URL;
+const envKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY;
 
-// Cast import.meta to any to access env variables without relying on vite/client types which are missing
-const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || 'YOUR_SUPABASE_URL_HERE';
-const supabaseKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY_HERE';
+// Use placeholders if env vars are missing to prevent "Invalid URL" crash
+// This ensures the app renders even if misconfigured (though auth will fail)
+const supabaseUrl = envUrl && envUrl.startsWith('http') ? envUrl : 'https://placeholder.supabase.co';
+const supabaseKey = envKey || 'placeholder-key';
 
-if (!supabaseUrl || supabaseUrl.includes('YOUR_SUPABASE_URL')) {
-  console.warn('⚠️ SUPABASE SETUP WARNING: Please replace "YOUR_SUPABASE_URL_HERE" and "YOUR_SUPABASE_ANON_KEY_HERE" in lib/supabase.ts with your actual keys from the Supabase Dashboard > Project Settings > API.');
+if (!envUrl || !envKey) {
+  console.error(
+    '🔴 Supabase Config Missing: Please create a .env file with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.'
+  );
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
