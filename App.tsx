@@ -1,14 +1,29 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { CATEGORIES, QUESTIONS, SCORING_RESULTS } from './constants';
 import QuestionCard from './components/QuestionCard';
 import ResultModal from './components/ResultModal';
 import { ScoreResult } from './types';
-import { ShieldCheck, Calculator, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Calculator, AlertTriangle, CheckCircle2, Save } from 'lucide-react';
 
 const App: React.FC = () => {
-  const [answers, setAnswers] = useState<Record<number, number>>({});
+  // Initialize state from localStorage if available
+  const [answers, setAnswers] = useState<Record<number, number>>(() => {
+    try {
+      const saved = localStorage.getItem('resilience_assessment_answers');
+      return saved ? JSON.parse(saved) : {};
+    } catch (error) {
+      console.error("Could not load answers from local storage", error);
+      return {};
+    }
+  });
+  
   const [showResult, setShowResult] = useState(false);
   const [showIncompleteAlert, setShowIncompleteAlert] = useState(false);
+
+  // Effect to save answers to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('resilience_assessment_answers', JSON.stringify(answers));
+  }, [answers]);
 
   // Calculate total score
   const totalScore = useMemo(() => {
@@ -50,6 +65,7 @@ const App: React.FC = () => {
   const handleReset = () => {
     if (window.confirm("آیا مطمئن هستید که می‌خواهید تمام پاسخ‌ها را پاک کنید؟")) {
       setAnswers({});
+      localStorage.removeItem('resilience_assessment_answers'); // Clear local storage
       setShowResult(false);
       setShowIncompleteAlert(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -67,7 +83,14 @@ const App: React.FC = () => {
             </div>
             <div>
               <h1 className="text-xl md:text-2xl font-bold leading-tight">چک‌لیست ارزیابی تاب‌آوری سازمان</h1>
-              <p className="text-indigo-200 text-xs md:text-sm mt-1 font-light tracking-wide">رهیاران مسیر اعتماد - نسخه دیجیتال</p>
+              <p className="text-indigo-200 text-xs md:text-sm mt-1 font-light tracking-wide flex items-center gap-1">
+                رهیاران مسیر اعتماد - نسخه دیجیتال
+                {answeredCount > 0 && (
+                  <span className="bg-white/10 px-2 py-0.5 rounded-full text-[10px] flex items-center gap-1 mr-2">
+                    <Save className="w-3 h-3" /> ذخیره خودکار
+                  </span>
+                )}
+              </p>
             </div>
           </div>
           
