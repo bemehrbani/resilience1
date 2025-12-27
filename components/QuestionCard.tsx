@@ -1,5 +1,5 @@
 import React from 'react';
-import { Question, LikertOption } from '../types';
+import { Question } from '../types';
 import { LIKERT_OPTIONS } from '../constants';
 
 interface QuestionCardProps {
