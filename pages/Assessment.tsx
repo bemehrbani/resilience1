@@ -5,7 +5,7 @@ import { CATEGORIES, QUESTIONS, SCORING_RESULTS } from '../constants';
 import QuestionCard from '../components/QuestionCard';
 import ResultModal from '../components/ResultModal';
 import { ScoreResult } from '../types';
-import { Calculator, AlertTriangle, CheckCircle2, Save, Building } from 'lucide-react';
+import { Calculator, CheckCircle2, Building } from 'lucide-react';
 
 const Assessment: React.FC = () => {
   const navigate = useNavigate();
@@ -14,7 +14,6 @@ const Assessment: React.FC = () => {
   const [showResult, setShowResult] = useState(false);
   const [showIncompleteAlert, setShowIncompleteAlert] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1); // For category navigation
 
   // Calculate total score
   const totalScore = useMemo(() => {
