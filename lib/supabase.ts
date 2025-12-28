@@ -1,19 +1,30 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Access environment variables safely
-// We use a fallback to an empty object because sometimes import.meta.env might be undefined
-const env = (import.meta as any).env || {};
-const envUrl = env.VITE_SUPABASE_URL;
-const envKey = env.VITE_SUPABASE_ANON_KEY;
+// Helper to safely access environment variables without crashing
+const getEnv = (key: string) => {
+  // Try accessing import.meta.env safely
+  try {
+    // @ts-ignore
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
+      // @ts-ignore
+      return import.meta.env[key];
+    }
+  } catch (e) {
+    console.warn('Error reading env var:', key);
+  }
+  return '';
+};
 
-// Use placeholders if env vars are missing to prevent "Invalid URL" crash
-// This ensures the app renders even if misconfigured (though auth will fail)
+const envUrl = getEnv('VITE_SUPABASE_URL');
+const envKey = getEnv('VITE_SUPABASE_ANON_KEY');
+
+// Fallback values to prevent application crash if env vars are missing
 const supabaseUrl = envUrl && envUrl.startsWith('http') ? envUrl : 'https://placeholder.supabase.co';
 const supabaseKey = envKey || 'placeholder-key';
 
 if (!envUrl || !envKey) {
-  console.error(
-    '🔴 Supabase Config Missing: Please create a .env file with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.'
+  console.warn(
+    '⚠️ Supabase credentials missing! Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your Vercel Project Settings > Environment Variables.'
   );
 }
 
